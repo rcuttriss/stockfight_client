@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,10 +10,8 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import io from "socket.io-client";
 import "./Chart.css";
-
-const WEBSOCKET_API_URL = "http://localhost:3001"; // Replace with your API URL
+import socket from "../../socket";
 
 ChartJS.register(
   CategoryScale,
@@ -42,53 +40,76 @@ function convertUnixMsToTime(unixMs) {
   return formattedTime;
 }
 
-const StockChart = () => {
+const MAX_CHART_LENGTH = 60;
+const TIME_INTERVAL_MS = 1000;
+
+const StockChart = ({ symbol }) => {
   const [timestamps, setTimeStamps] = useState([]);
+  const lastTimeStamp = useRef(0);
   const [prices, setPrices] = useState([]);
   const [minPrice, setMinPrice] = useState(Infinity); // Initialize to positive infinity
   const [maxPrice, setMaxPrice] = useState(-Infinity); // Initialize to negative infinity
 
-  const socket = io(WEBSOCKET_API_URL); // Replace with your server's URL
-
   useEffect(() => {
-    socket.on("connection", (socket) => {
-      console.log("React Client connected to Express server");
-    });
+    // no-op if the socket is already connected
+    socket.connect();
 
     socket.on("finnhub-data", (data) => {
-      if (data === undefined) {
+      if (data["data"] === undefined || data["data"].length === 0) {
         return;
       }
-      // Process the received data from Finnhub
-      const newTimestamps = data["data"].map((item) =>
-        convertUnixMsToTime(item.t)
-      );
-      const newPrices = data["data"].map((item) => item.p);
+      const bigData = data["data"].filter((item) => item.s === symbol);
+      let prunedTimeStamps = [];
+      let prunedPrices = [];
 
-      // Update state with splicing and minimum/maximum tracking
-      setTimeStamps([
-        ...timestamps.slice(0, 50 - newTimestamps.length),
-        ...newTimestamps,
-      ]);
-      setPrices([...prices, ...newPrices]);
+      for (const element of bigData) {
+        const currTime = element["t"];
+        const currPrice = element["p"];
+
+        if (currTime - lastTimeStamp.current >= TIME_INTERVAL_MS) {
+          lastTimeStamp.current = currTime;
+          prunedTimeStamps.push(convertUnixMsToTime(currTime));
+          prunedPrices.push(currPrice);
+
+          setMinPrice((prevMin) => Math.min(prevMin, currPrice));
+          setMaxPrice((prevMax) => Math.max(prevMax, currPrice));
+        }
+      }
+
+      setTimeStamps((prevTimestamps) => {
+        const combinedLength = prevTimestamps.length + prunedTimeStamps.length;
+        if (combinedLength > MAX_CHART_LENGTH) {
+          const sliceAmount = combinedLength - MAX_CHART_LENGTH;
+          const prevTimestampsSliced = prevTimestamps.slice(sliceAmount);
+          return [...prevTimestampsSliced, ...prunedTimeStamps];
+        } else {
+          return [...prevTimestamps, ...prunedTimeStamps];
+        }
+      });
+
+      setPrices((prevPrices) => {
+        const combinedLength = prevPrices.length + prunedPrices.length;
+        if (combinedLength > MAX_CHART_LENGTH) {
+          const sliceAmount = combinedLength - MAX_CHART_LENGTH;
+          const prevPricesSliced = prevPrices.slice(sliceAmount);
+          return [...prevPricesSliced, ...prunedPrices];
+        } else {
+          return [...prevPrices, ...prunedPrices];
+        }
+      });
     });
-  }, []);
 
-  useEffect(() => {
-    // Update min and max price based on current prices
-    console.log(prices);
-    setMinPrice(Math.min(...prices));
-    setMaxPrice(Math.max(...prices));
-  }, [prices]);
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const chartData = {
     labels: timestamps,
     datasets: [
       {
-        label: "BINANCE:BTCUSDT",
-        data: prices.map(
-          (price) => ((price - minPrice) / (maxPrice - minPrice)) * 100
-        ),
+        label: symbol,
+        data: prices,
         backgroundColor: "rgba(54, 162, 235, 0.5)",
         borderColor: "rgba(54, 162, 235, 1)",
         borderWidth: 1,
@@ -97,20 +118,25 @@ const StockChart = () => {
   };
 
   const options = {
+    animations: false,
     responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-      title: {
-        display: true,
-        text: "Chart.js Line Chart",
-      },
+    layout: {
+      padding: 20,
+    },
+    scales: {
+      yAxes: [
+        {
+          ticks: {
+            min: minPrice * 1.4,
+            max: maxPrice * 1.4,
+          },
+        },
+      ],
     },
   };
 
   return (
-    <div className="chart">
+    <div className="Chart">
       <Line data={chartData} options={options} />
     </div>
   );
