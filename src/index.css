@@ -17,6 +17,7 @@ html, :root {
 }
 
 #root {
+  display: flex;
   position: relative;
   min-width: 100vw;
   min-height: 100vh;
@@ -25,13 +26,25 @@ html, :root {
 
 .ChartBox {
   background-color: #282c34;
-  height: 100%;
+  flex: 1/3;
+  min-width: 33.33%;
   display: flex;
   flex-direction: column;
-  font-size: calc(10px + 2vmin);
+  justify-content: stretch;
   color: white;
 }
 
 .Chart {
-  width: 33%;
+  height: 33%;
+  width: 100%;
+}
+
+.Details {
+  background-color: rgb(49, 43, 83);
+  flex: 2/3;
+  min-width: 69%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
 }

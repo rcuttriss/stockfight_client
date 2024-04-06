@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,8 +10,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import "./Chart.css";
-import socket from "../../socket";
+import socket from "../../lib/socket";
 
 ChartJS.register(
   CategoryScale,
@@ -41,10 +40,10 @@ function convertUnixMsToTime(unixMs) {
 }
 
 const MAX_CHART_LENGTH = 60;
-const TIME_INTERVAL_MS = 1000;
+const TIME_INTERVAL_MS = 2000;
 
-const StockChart = ({ symbol }) => {
-  const [timestamps, setTimeStamps] = useState([]);
+const StockChart = ({ symbol, stockData, setStockData }) => {
+  const [timestamps, setTimestamps] = useState([]);
   const lastTimeStamp = useRef(0);
   const [prices, setPrices] = useState([]);
   const [minPrice, setMinPrice] = useState(Infinity); // Initialize to positive infinity
@@ -58,10 +57,13 @@ const StockChart = ({ symbol }) => {
       if (data["data"] === undefined || data["data"].length === 0) {
         return;
       }
+
+      // filter by symbol
       const bigData = data["data"].filter((item) => item.s === symbol);
       let prunedTimeStamps = [];
       let prunedPrices = [];
 
+      // prune the incoming data to only show a data point every TIME_INTERVAL_MS
       for (const element of bigData) {
         const currTime = element["t"];
         const currPrice = element["p"];
@@ -76,7 +78,8 @@ const StockChart = ({ symbol }) => {
         }
       }
 
-      setTimeStamps((prevTimestamps) => {
+      // set timeStamps and prices, slicing old data to keep max data points at MAX_CHART_LENGTH
+      setTimestamps((prevTimestamps) => {
         const combinedLength = prevTimestamps.length + prunedTimeStamps.length;
         if (combinedLength > MAX_CHART_LENGTH) {
           const sliceAmount = combinedLength - MAX_CHART_LENGTH;
@@ -104,6 +107,10 @@ const StockChart = ({ symbol }) => {
     };
   }, []);
 
+  useEffect(() => {
+    setStockData(prices[MAX_CHART_LENGTH - 1]);
+  }, [prices]);
+
   const chartData = {
     labels: timestamps,
     datasets: [
@@ -121,17 +128,7 @@ const StockChart = ({ symbol }) => {
     animations: false,
     responsive: true,
     layout: {
-      padding: 20,
-    },
-    scales: {
-      yAxes: [
-        {
-          ticks: {
-            min: minPrice * 1.4,
-            max: maxPrice * 1.4,
-          },
-        },
-      ],
+      padding: 10,
     },
   };
 
