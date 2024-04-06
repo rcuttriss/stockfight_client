@@ -2,9 +2,10 @@ import { useContext, useState } from "react";
 import StockContext from "../../lib/context";
 
 function Details() {
-  const { stockData, setStockData } = useContext(StockContext);
+  const { btcData, setBtcData, ethData, setEthData, mkrData, setMkrData } =
+    useContext(StockContext);
 
-  return <div className="Details">{stockData}</div>;
+  return <div className="Details">{}</div>;
 }
 
 export default Details;

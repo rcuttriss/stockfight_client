@@ -35,8 +35,23 @@ html, :root {
 }
 
 .Chart {
+  display: flex;
   height: 33%;
   width: 100%;
+}
+
+.ChartTrend {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 12rem;
+}
+
+.TrendIcon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .Details {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,6 +11,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import socket from "../../lib/socket";
+import ChartTrend from "./ChartTrend/ChartTrend";
 
 ChartJS.register(
   CategoryScale,
@@ -45,9 +46,6 @@ const TIME_INTERVAL_MS = 2000;
 const StockChart = ({ symbol, stockData, setStockData }) => {
   const [timestamps, setTimestamps] = useState([]);
   const lastTimeStamp = useRef(0);
-  const [prices, setPrices] = useState([]);
-  const [minPrice, setMinPrice] = useState(Infinity); // Initialize to positive infinity
-  const [maxPrice, setMaxPrice] = useState(-Infinity); // Initialize to negative infinity
 
   useEffect(() => {
     // no-op if the socket is already connected
@@ -72,9 +70,6 @@ const StockChart = ({ symbol, stockData, setStockData }) => {
           lastTimeStamp.current = currTime;
           prunedTimeStamps.push(convertUnixMsToTime(currTime));
           prunedPrices.push(currPrice);
-
-          setMinPrice((prevMin) => Math.min(prevMin, currPrice));
-          setMaxPrice((prevMax) => Math.max(prevMax, currPrice));
         }
       }
 
@@ -90,7 +85,7 @@ const StockChart = ({ symbol, stockData, setStockData }) => {
         }
       });
 
-      setPrices((prevPrices) => {
+      setStockData((prevPrices) => {
         const combinedLength = prevPrices.length + prunedPrices.length;
         if (combinedLength > MAX_CHART_LENGTH) {
           const sliceAmount = combinedLength - MAX_CHART_LENGTH;
@@ -107,16 +102,12 @@ const StockChart = ({ symbol, stockData, setStockData }) => {
     };
   }, []);
 
-  useEffect(() => {
-    setStockData(prices[MAX_CHART_LENGTH - 1]);
-  }, [prices]);
-
   const chartData = {
     labels: timestamps,
     datasets: [
       {
         label: symbol,
-        data: prices,
+        data: stockData,
         backgroundColor: "rgba(54, 162, 235, 0.5)",
         borderColor: "rgba(54, 162, 235, 1)",
         borderWidth: 1,
@@ -135,6 +126,10 @@ const StockChart = ({ symbol, stockData, setStockData }) => {
   return (
     <div className="Chart">
       <Line data={chartData} options={options} />
+      <ChartTrend
+        stockData={stockData}
+        MAX_CHART_LENGTH={MAX_CHART_LENGTH}
+      ></ChartTrend>
     </div>
   );
 };
