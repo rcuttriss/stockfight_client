@@ -11,7 +11,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import socket from "../../lib/socket";
-import ChartTrend from "./ChartTrend/ChartTrend";
+import ChartTrend from "./ChartTrend";
 
 ChartJS.register(
   CategoryScale,

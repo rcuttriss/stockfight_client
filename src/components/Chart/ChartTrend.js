@@ -23,7 +23,7 @@ function ChartTrend({ stockData, MAX_CHART_LENGTH }) {
       <div className="TrendIcon">
         {stockData.length >= MAX_CHART_LENGTH && (
           <>
-            {MAX_CHART_LENGTH + "s"}
+            {"Last " + MAX_CHART_LENGTH}
             {trendFar > 0 && <ArrowDropUpIcon />}
             {trendFar < 0 && <ArrowDropDownIcon />}
             {trendFar === 0 && <RemoveIcon />}${trendFar.toFixed(2)}

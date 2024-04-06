@@ -23,7 +23,7 @@ const App = () => {
         }}
       >
         <ChartBox />
-        {/* <Details /> */}
+        <Details />
       </StockContext.Provider>
     </ThemeProvider>
   );
