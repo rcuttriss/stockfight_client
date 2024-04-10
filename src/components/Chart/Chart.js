@@ -41,7 +41,7 @@ function convertUnixMsToTime(unixMs) {
 }
 
 const MAX_CHART_LENGTH = 60;
-const TIME_INTERVAL_MS = 2000;
+const TIME_INTERVAL_MS = 1000;
 
 const StockChart = ({ symbol, stockData, setStockData }) => {
   const [timestamps, setTimestamps] = useState([]);
@@ -117,15 +117,19 @@ const StockChart = ({ symbol, stockData, setStockData }) => {
 
   const options = {
     animations: false,
-    responsive: true,
     layout: {
-      padding: 10,
+      padding: 20,
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
     },
   };
 
   return (
     <div className="Chart">
-      <Line data={chartData} options={options} />
+      <Line data={chartData} options={options} width={368} />
       <ChartTrend
         stockData={stockData}
         MAX_CHART_LENGTH={MAX_CHART_LENGTH}

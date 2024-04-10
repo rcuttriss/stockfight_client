@@ -1,11 +1,13 @@
 import DataGridStock from "./DataGrid";
-import StockButtonGroup from "./StockButtons/StockButtonGroup";
+import BuyArea from "./BuyArea";
+import CashStackDisplay from "./CashStackDisplay";
 
 function Details() {
   return (
     <div className="Details">
+      <CashStackDisplay></CashStackDisplay>
       <DataGridStock></DataGridStock>
-      <StockButtonGroup></StockButtonGroup>
+      <BuyArea></BuyArea>
     </div>
   );
 }

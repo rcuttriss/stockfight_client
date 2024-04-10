@@ -10,6 +10,8 @@ const App = () => {
   const [ethData, setEthData] = useState([]);
   const [mkrData, setMkrData] = useState([]);
 
+  const [stockPicks, setStockPicks] = useState([]);
+  const [cashStack, setCashStack] = useState(100000);
   return (
     <ThemeProvider theme={theme}>
       <StockContext.Provider
@@ -20,6 +22,10 @@ const App = () => {
           setEthData,
           mkrData,
           setMkrData,
+          stockPicks,
+          setStockPicks,
+          cashStack,
+          setCashStack,
         }}
       >
         <ChartBox />

@@ -18,7 +18,7 @@ html, :root {
 
 #root {
   display: grid;
-  grid-template-columns: 45% 55% ;
+  grid-template-columns: 1fr 1fr ;
   position: relative;
   min-width: 100vw;
   min-height: 100vh;
@@ -27,15 +27,15 @@ html, :root {
 
 .ChartBox {
   background-color: #282c34;
-  min-width: 33.33%;
   display: flex;
   flex-direction: column;
-  justify-content: stretch;
   color: white;
 }
 
 .Chart {
-  display: flex;
+  display: grid;
+  grid-template-columns: 80% 20%;
+  justify-items: center;
   height: 33%;
   width: 100%;
 }
@@ -44,30 +44,41 @@ html, :root {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  width: 12rem;
+  width: auto;
 }
 
 .TrendIcon {
   display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .Details {
-  display: flex;
-  flex-direction: column;
+  background-color: rgb(48, 48, 87);
+  display: grid;
+  grid-template-rows: 1% 60% 20%;
   justify-content: center;
+  justify-items: center;
+  align-content: center;
   align-items: center;
+  padding: 2rem;
+  gap: 3rem;
   font-size: 3rem;
 }
 
-.StockButtonGroup {
+.BuyArea {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
+  width: 100%;
   height: 20%;
+  padding: 2rem;
+}
+.FormControlBuyArea{
+  background-color: #282c34;
+  border-radius: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
 }
 
 .positive {
@@ -75,4 +86,21 @@ html, :root {
 }
 .negative {
   background-color: red;
+}
+
+.sellPreview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  gap: 2rem;
+  color: white;
+}
+
+.cashStackDisplay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 2rem;
 }

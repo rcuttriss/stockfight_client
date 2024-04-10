@@ -16,16 +16,16 @@ function ChartTrend({ stockData, MAX_CHART_LENGTH }) {
     <div className="ChartTrend">
       <div>Current: ${stockData[stockData.length - 1]}</div>
       <div className="TrendIcon">
-        Last: {trendLast > 0 && <ArrowDropUpIcon />}
-        {trendLast < 0 && <ArrowDropDownIcon />}
+        Last: {trendLast > 0 && <ArrowDropUpIcon color="success" />}
+        {trendLast < 0 && <ArrowDropDownIcon color="error" />}
         {trendLast === 0 && <RemoveIcon />}${trendLast.toFixed(2)}
       </div>
       <div className="TrendIcon">
         {stockData.length >= MAX_CHART_LENGTH && (
           <>
             {"Last " + MAX_CHART_LENGTH}
-            {trendFar > 0 && <ArrowDropUpIcon />}
-            {trendFar < 0 && <ArrowDropDownIcon />}
+            {trendFar > 0 && <ArrowDropUpIcon color="success" />}
+            {trendFar < 0 && <ArrowDropDownIcon color="error" />}
             {trendFar === 0 && <RemoveIcon />}${trendFar.toFixed(2)}
           </>
         )}
